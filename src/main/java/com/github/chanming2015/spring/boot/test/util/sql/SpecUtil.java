@@ -1,7 +1,8 @@
 package com.github.chanming2015.spring.boot.test.util.sql;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -24,20 +25,35 @@ public class SpecUtil
             @Override
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb)
             {
-                if ((specParam != null))
+                if (specParam != null)
                 {
                     Predicate result = null;
-                    if (specParam.getCriterions().size() > 0)
+                    Collection<SpecCriterion> specs = specParam.getCriterions();
+                    if (specs.size() > 0)
                     {
-                        List<Predicate> predicates = new ArrayList<Predicate>(specParam
-                                .getCriterions().size());
-                        for (SpecCriterion spec : specParam.getCriterions())
+                        Set<Predicate> predicates = new HashSet<Predicate>(4);
+                        for (SpecCriterion spec : specs)
                         {
                             predicates.add(spec.getPredicate(root, cb));
                         }
                         result = cb.and(predicates.toArray(new Predicate[predicates.size()]));
-                        return result;
                     }
+                    
+                    Set<Collection<SpecCriterion>> orSpecSet = specParam.getOrSpecCriterions();
+                    if ((orSpecSet != null) && (orSpecSet.size() > 0))
+                    {
+                        for (Collection<SpecCriterion> orSpecs : orSpecSet)
+                        {
+                            Set<Predicate> predicates = new HashSet<Predicate>(4);
+                            for (SpecCriterion spec : orSpecs)
+                            {
+                                predicates.add(spec.getPredicate(root, cb));
+                            }
+                            Predicate orResult = cb.and(predicates.toArray(new Predicate[predicates.size()]));
+                            result = cb.or(result, orResult);
+                        }
+                    }
+                    return result;
                 }
                 return cb.conjunction();
             }

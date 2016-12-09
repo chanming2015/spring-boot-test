@@ -13,6 +13,4 @@ import javax.persistence.criteria.Root;
 public interface SpecCriterion
 {
     <T> Predicate getPredicate(Root<T> root, CriteriaBuilder cb);
-
-    String getName();
 }
