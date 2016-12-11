@@ -1,5 +1,8 @@
 package com.github.chanming2015.spring.boot.test.web;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+
 import java.util.List;
 
 import javax.persistence.Tuple;
@@ -7,7 +10,10 @@ import javax.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.chanming2015.spring.boot.test.entity.Test;
@@ -31,8 +37,10 @@ public class ExampleController
     @Autowired
     private TupleRepository tupleRepository;
 
-    @RequestMapping("/")
-    String home()
+    @ApiOperation(value = "测试接口")
+    @ApiResponse(code = 200, message = "OK")
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    ResponseEntity<String> home()
     {
 
         SpecParam<Test> specParam = new SpecParam<Test>();
@@ -54,6 +62,6 @@ public class ExampleController
         SpecProperty p2 = SpecProperty.forName("password");
 
         List<Tuple> l2 = tupleRepository.findAll(Test.class, SpecUtil.spec(specParam), new Sort(Direction.DESC, "id"), p1, p2);
-        return "OK";
+        return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 }
