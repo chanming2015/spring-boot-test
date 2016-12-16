@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -20,43 +17,32 @@ public class SpecUtil
 {
     public static <T> Specification<T> spec(final SpecParam<T> specParam)
     {
-        return new Specification<T>()
+        return (root, query, cb) ->
         {
-            @Override
-            public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb)
+            if (specParam != null)
             {
-                if (specParam != null)
+                Predicate result = null;
+                Collection<SpecCriterion> specs = specParam.getCriterions();
+                if (specs.size() > 0)
                 {
-                    Predicate result = null;
-                    Collection<SpecCriterion> specs = specParam.getCriterions();
-                    if (specs.size() > 0)
+                    Set<Predicate> predicates = new HashSet<Predicate>(4);
+                    specs.forEach(spec -> predicates.add(spec.getPredicate(root, cb)));
+                    result = cb.and(predicates.toArray(new Predicate[predicates.size()]));
+                }
+                Set<Collection<SpecCriterion>> orSpecSet = specParam.getOrSpecCriterions();
+                if ((orSpecSet != null) && (orSpecSet.size() > 0))
+                {
+                    for (Collection<SpecCriterion> orSpecs : orSpecSet)
                     {
                         Set<Predicate> predicates = new HashSet<Predicate>(4);
-                        for (SpecCriterion spec : specs)
-                        {
-                            predicates.add(spec.getPredicate(root, cb));
-                        }
-                        result = cb.and(predicates.toArray(new Predicate[predicates.size()]));
+                        orSpecs.forEach(spec -> predicates.add(spec.getPredicate(root, cb)));
+                        Predicate orResult = cb.and(predicates.toArray(new Predicate[predicates.size()]));
+                        result = cb.or(result, orResult);
                     }
-                    
-                    Set<Collection<SpecCriterion>> orSpecSet = specParam.getOrSpecCriterions();
-                    if ((orSpecSet != null) && (orSpecSet.size() > 0))
-                    {
-                        for (Collection<SpecCriterion> orSpecs : orSpecSet)
-                        {
-                            Set<Predicate> predicates = new HashSet<Predicate>(4);
-                            for (SpecCriterion spec : orSpecs)
-                            {
-                                predicates.add(spec.getPredicate(root, cb));
-                            }
-                            Predicate orResult = cb.and(predicates.toArray(new Predicate[predicates.size()]));
-                            result = cb.or(result, orResult);
-                        }
-                    }
-                    return result;
                 }
-                return cb.conjunction();
+                return result;
             }
+            return cb.conjunction();
         };
     }
 }

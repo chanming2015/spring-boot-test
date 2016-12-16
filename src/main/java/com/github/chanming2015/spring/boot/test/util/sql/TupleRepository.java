@@ -1,6 +1,7 @@
 package com.github.chanming2015.spring.boot.test.util.sql;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TupleRepository
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Collection<SpecProperty> properties)
     {
-        return findAll(domainClass, null, null, properties.toArray(new SpecProperty[properties.size()]));
+        return findAll(domainClass, null, null, properties);
     }
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Specification<T> spec, SpecProperty... properties)
@@ -46,7 +47,7 @@ public class TupleRepository
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Specification<T> spec, Collection<SpecProperty> properties)
     {
-        return findAll(domainClass, spec, null, properties.toArray(new SpecProperty[properties.size()]));
+        return findAll(domainClass, spec, null, properties);
     }
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Sort sort, SpecProperty... properties)
@@ -56,27 +57,23 @@ public class TupleRepository
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Sort sort, Collection<SpecProperty> properties)
     {
-        return findAll(domainClass, null, sort, properties.toArray(new SpecProperty[properties.size()]));
-    }
-
-    public <T> List<Tuple> findAll(Class<T> domainClass, Specification<T> spec, Sort sort, Collection<SpecProperty> properties)
-    {
-        return findAll(domainClass, spec, sort, properties.toArray(new SpecProperty[properties.size()]));
+        return findAll(domainClass, null, sort, properties);
     }
 
     public <T> List<Tuple> findAll(Class<T> domainClass, Specification<T> spec, Sort sort, SpecProperty... properties)
     {
-        if ((properties != null) && (properties.length > 0))
+        return findAll(domainClass, spec, sort, Arrays.asList(properties));
+    }
+
+    public <T> List<Tuple> findAll(Class<T> domainClass, Specification<T> spec, Sort sort, Collection<SpecProperty> properties)
+    {
+        if ((properties != null) && (properties.size() > 0))
         {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Tuple> query = cb.createTupleQuery();
             Root<T> root = query.from(domainClass);
-
-            List<Selection<?>> selections = new ArrayList<Selection<?>>(properties.length);
-            for (SpecProperty specProperty : properties)
-            {
-                selections.add(root.get(specProperty.getPropertyName()).alias(specProperty.getAliasName()));
-            }
+            List<Selection<?>> selections = new ArrayList<Selection<?>>(properties.size());
+            properties.forEach(specProperty -> selections.add(root.get(specProperty.getPropertyName()).alias(specProperty.getAliasName())));
             query.multiselect(selections);
             if (spec != null)
             {

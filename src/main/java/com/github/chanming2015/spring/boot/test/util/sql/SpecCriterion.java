@@ -10,7 +10,8 @@ import javax.persistence.criteria.Root;
  * @author XuMaoSen
  * Version:1.0.0
  */
+@FunctionalInterface
 public interface SpecCriterion
 {
-    <T> Predicate getPredicate(Root<T> root, CriteriaBuilder cb);
+    Predicate getPredicate(Root<?> root, CriteriaBuilder cb);
 }
