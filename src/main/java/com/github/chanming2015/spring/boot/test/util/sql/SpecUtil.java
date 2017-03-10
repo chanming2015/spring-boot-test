@@ -36,8 +36,8 @@ public class SpecUtil
                     {
                         Set<Predicate> predicates = new HashSet<Predicate>(4);
                         orSpecs.forEach(spec -> predicates.add(spec.getPredicate(root, cb)));
-                        Predicate orResult = cb.and(predicates.toArray(new Predicate[predicates.size()]));
-                        result = cb.or(result, orResult);
+                        Predicate orResult = cb.or(predicates.toArray(new Predicate[predicates.size()]));
+                        result = cb.and(result, orResult);
                     }
                 }
                 return result;
