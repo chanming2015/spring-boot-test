@@ -19,13 +19,12 @@ public class SpecUtil
     {
         return (root, query, cb) ->
         {
-            if (specParam != null)
+            if ((specParam != null) && (specParam.getCriterions().size() > 0))
             {
                 Predicate result = null;
                 Collection<SpecCriterion> specs = specParam.getCriterions();
-                if (specs.size() > 0)
                 {
-                    Set<Predicate> predicates = new HashSet<Predicate>(4);
+                    Set<Predicate> predicates = new HashSet<>(4);
                     specs.forEach(spec -> predicates.add(spec.getPredicate(root, cb)));
                     result = cb.and(predicates.toArray(new Predicate[predicates.size()]));
                 }
@@ -34,10 +33,11 @@ public class SpecUtil
                 {
                     for (Collection<SpecCriterion> orSpecs : orSpecSet)
                     {
-                        Set<Predicate> predicates = new HashSet<Predicate>(4);
+                        Set<Predicate> predicates = new HashSet<>(4);
                         orSpecs.forEach(spec -> predicates.add(spec.getPredicate(root, cb)));
-                        Predicate orResult = cb.or(predicates.toArray(new Predicate[predicates.size()]));
-                        result = cb.and(result, orResult);
+                        Predicate orResult = cb
+                                .and(predicates.toArray(new Predicate[predicates.size()]));
+                        result = cb.or(result, orResult);
                     }
                 }
                 return result;
