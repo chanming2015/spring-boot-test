@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.chanming2015.spring.boot.test.entity.Test;
 import com.github.chanming2015.spring.boot.test.repository.TestRepository;
-import com.github.chanming2015.spring.boot.test.util.sql.SpecParam;
-import com.github.chanming2015.spring.boot.test.util.sql.SpecProperty;
-import com.github.chanming2015.spring.boot.test.util.sql.SpecUtil;
-import com.github.chanming2015.spring.boot.test.util.sql.TupleRepository;
+import com.github.chanming2015.utils.sql.SpecParam;
+import com.github.chanming2015.utils.sql.SpecProperty;
+import com.github.chanming2015.utils.sql.SpecUtil;
+import com.github.chanming2015.utils.sql.TupleRepository;
 
 /**
  * Description:
