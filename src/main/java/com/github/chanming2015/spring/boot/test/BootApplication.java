@@ -6,6 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -23,7 +26,7 @@ import com.google.common.base.Predicates;
  *
  * @author XuMaoSen Version:1.0.0
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.github.chanming2015.utils.*", "com.github.chanming2015.spring.boot.test.*"})
 @EnableSwagger2
 public class BootApplication
 {
@@ -50,5 +53,20 @@ public class BootApplication
     {
         return new ApiInfoBuilder().title("Document Api").description("Spring-boot-Springfox Example").license("Apache License Version 2.0")
                 .contact("476076812@qq.com").version("2.0").build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory)
+    {
+        return new RestTemplate(factory);
+    }
+
+    @Bean
+    public ClientHttpRequestFactory simpleClientHttpRequestFactory()
+    {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(60000);
+        factory.setConnectTimeout(15000);
+        return factory;
     }
 }

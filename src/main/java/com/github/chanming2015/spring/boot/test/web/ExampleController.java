@@ -61,7 +61,7 @@ public class ExampleController
         SpecProperty p1 = SpecProperty.forName("username");
         SpecProperty p2 = SpecProperty.forName("password");
 
-        List<Tuple> l2 = tupleRepository.findAll(Test.class, SpecUtil.spec(specParam), new Sort(Direction.DESC, "id"), p1, p2);
+        List<Tuple> l2 = tupleRepository.findAll(Test.class, SpecUtil.spec(specParam), new Sort(Direction.DESC, "id"), null, p1, p2);
         return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 }
